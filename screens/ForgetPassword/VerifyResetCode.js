@@ -28,7 +28,7 @@ var VerifyResetCode = (props) => {
       }
 
     var Verify = (email, resetCode) => {
-        return fetch('https://lifewear.mn07.xyz/api/reset_password/verify', {
+        fetch('https://lifewear.mn07.xyz/api/reset_password/verify', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ var VerifyResetCode = (props) => {
         }).then((response) => response.json())
         .then((json) => Promise.resolve(json))
         .then((data) => showToast(data))
-        .catch((err) => Promise.reject(err));
+        .catch((err) => console.error(err));
       }
 
     return (

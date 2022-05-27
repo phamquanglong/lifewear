@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, {useState, useEffect, useMemo, useLayoutEffect, useContext} from 'react';
 import {View, 
   Text, 
   TouchableOpacity, 
@@ -6,38 +6,94 @@ import {View,
   VirtualizedList,
   SafeAreaView,
   StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import ProductItem from '../ProductsGrid/ProductItem';
 import DropShadow from "react-native-drop-shadow";
 import { StackActions, useScrollToTop } from '@react-navigation/native';
+import {colors} from '../../constants';
+import {refreshContext} from '../FoodList/FoodList'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { addWishList, deleteWishlist } from '../WishList/WishListController';
+import { setWishList } from '../../Store/actions';
+import { useDispatch } from 'react-redux';
+
 
 var SimilarProducts = (props) => {
+    const dispatch = useDispatch();
 
-    var [productsData, setProductsData] = useState([]);
-
-    var getProductsData = async () => {
-        try {
-            const response = await fetch('https://lifewear.mn07.xyz/api/products?limit=6&start=10');
-            
-            var json = await response.json();
-            setProductsData(json)
-        } catch (error) {
-            console.error(error);
-        } finally {() => {
-            setLoading(false);
-            }
-        }
+    const wishListData = (data) => {
+    dispatch(setWishList(data))
     }
 
-    useEffect(() => {
-        getProductsData()
-        return () => {
-          setProductsData({});
-        };
+    var [isLoading, setIsLoading] = useState(true)
+
+    var [productsData, setProductsData] = useState([])
+
+    var [category, setCategory] = useState()
+
+    var getProductsByCategory = (id) => {
+      fetch(`https://lifewear.mn07.xyz/api/categories/${id}?perpage=7&=`, {
+        headers: {
+          Accept: 'application/json',
+          "Content-Type": "application/json",
+        },
+      }).then(response => response.json())
+      .then(json => {
+        setProductsData(json.products.data)
+        setCategory(json.name)
+      })
+      .then(() => setIsLoading(false))
+    }
+
+    useLayoutEffect(() => {
+      getProductsByCategory(props.idCategory)
+      return () => {
+        setProductsData({})
+      };
     }, [])
 
-    return (
+    
+
+    var handleLike = (item) => {
+      var cloneProducts = productsData.map(product => {
+        if (item.name == product.name) {
+          return {
+            ...product,
+            isLiked:
+              product.isLiked == false ||
+              product.isLiked == undefined
+                ? true
+                : false,
+          };
+        }
+        return product;
+      });
+      setProductsData(cloneProducts);
+    }
+
+    return isLoading ? (
+      <ActivityIndicator animating={true} />
+    ) : (
+      <View style={styles.container}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginHorizontal: 20,
+            marginVertical: 10,
+          }}>
+          <View style={styles.line}></View>
+          <Text style={styles.similarProducts}>
+            {props.title == undefined ? category : props.title}
+          </Text>
+          <View style={styles.line}></View>
+        </View>
         <FlatList
+          initialNumToRender={2}
           listKey={item => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -52,47 +108,67 @@ var SimilarProducts = (props) => {
                   marginLeft: index < 1 ? 10 : 0,
                   marginRight: 10,
                   marginBottom: 10,
-                  // marginTop: index <= 1 ? 10 : 0,
                   borderRadius: 10,
                 }}
                 onPress={() => {
-                  props.navigation.dispatch(StackActions.replace('ProductScreen', {item: item}))
-                  props.onPress()
+                  props.navigation.dispatch(
+                    StackActions.push('ProductScreen', {item: item}),
+                  );
                 }}>
                 <ProductItem
                   item={item}
                   index={index}
                   onPress={() => {
-                    var cloneProducts = productsData.map(product => {
-                      if (item.name == product.name) {
-                        return {
-                          ...product,
-                          isLiked:
-                            product.isLiked == false ||
-                            product.isLiked == undefined
-                              ? true
-                              : false,
-                        };
-                      }
-                      return product;
-                    });
-                    setProductsData(cloneProducts);
+                    AsyncStorage.getItem('token').then(response => item.isLiked
+                      ? deleteWishlist(item.id, response, wishListData) : addWishList(item.id, response, wishListData));
+                    handleLike(item)
                   }}
                 />
               </TouchableOpacity>
             );
           }}
         />
+
+        {props.isShowBtn && <TouchableOpacity 
+        style={styles.btn}
+        onPress={() => {
+          props.navigation.navigate('CategoryScreen', {
+            idCategory: props.idCategory,
+          })
+        }}
+        >
+          <Text style={styles.textBtn}>See all products</Text>
+        </TouchableOpacity>}
+      </View>
     );
 }
 
 var styles = StyleSheet.create({
-  // shadowProp: {
-  //   shadowColor: 'black',
-  //   shadowOffset: {width: 0, height: 3},
-  //   shadowOpacity: 0.4,
-  //   shadowRadius: 2,
-  // },
+  container: {
+    flex: 0.7,
+  },
+  similarProducts: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    margin: 10,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.disable,
+  },
+  btn: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    margin: 10,
+    borderRadius: 5,
+  },
+  textBtn: {
+    color: 'white',
+  }
 });
 
 export default SimilarProducts;

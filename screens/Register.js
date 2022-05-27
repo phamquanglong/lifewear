@@ -68,10 +68,10 @@ var Register = (props) => {
       text1: 'Create Account Successful',
       text2: 'Welcome to LifeWear! 👋'
     });
-    // createUserWithEmailAndPassword(auth, email, password)
-    // .then(userCredential => {
-    //   const user = userCredential.user
-    // }).catch(error => console.error(error))
+    createUserWithEmailAndPassword(auth, email, password)
+    .then(userCredential => {
+      const user = userCredential.user
+    }).catch(error => console.error(error))
     setTimeout(() => {
       navigate('SignIn')
     }, 4000)
@@ -364,7 +364,7 @@ var Register = (props) => {
               </TouchableOpacity>
             </View>
           </View>
-          {keyboardIsShown == false && (
+          {/* {keyboardIsShown == false && (
             <View
               style={{
                 flex: 0.1,
@@ -405,7 +405,7 @@ var Register = (props) => {
                 </TouchableOpacity>
               </View>
             </View>
-          )}
+          )} */}
         </KeyboardAwareScrollView>
       </View>
     );

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext, useLayoutEffect} from 'react';
 import {
   Text,
   View,
@@ -16,25 +16,91 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
-import {images, icons, colors} from '../constants';
-import {UIButton, UIHeader} from '../components/index';
+import {images, icons, colors} from '../../constants';
+import {UIButton, UIHeader} from '../../components/index';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {isValidEmail, isValidPassword, isValidConfirmPassword} from '../utilities/validations'
+import {isValidEmail, isValidPassword, isValidConfirmPassword} from '../../utilities/validations'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
   auth,
   firebaseDatabase,
-} from './Firebase/Firebase'
-import {StackActions} from '@react-navigation/native'
+} from '../Firebase/Firebase'
+import {StackActions} from '@react-navigation/native';
+import TouchID from 'react-native-touch-id';
+import {fingerprintContext} from '../../navigation/App'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch, useSelector } from 'react-redux';
+import { setFingerprint } from '../../Store/actions';
+import { fingerprintSelector } from '../../Store/selector';
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import {
+  faCircleInfo,
+  faSignOut
+} from "@fortawesome/free-solid-svg-icons";
 
 
 var Settings = (props) => {
+  var fr = useSelector(fingerprintSelector)
+  console.log(fr)
+
+  var dispatchRedux = useDispatch();
+  var setFr = (data) => {
+    dispatchRedux(setFingerprint(data))
+  }
+
   var [isEnabledLockApp, setIsEnabledLockApp] = useState(true)
   var [isEnabledChangePassword, setIsEnabledChangePassword] = useState(true)
-  var [isEnabledFingerprint, setIsEnabledFingerprint] = useState(false)
+  var [isEnabledFingerprint, setIsEnabledFingerprint] = useState(isEnabledFingerprint)
   var [modalVisible, setModalVisible] = useState(false)
+  var [auth, setAuth] = useState(false)
 
   var {navigation, route} = props
+
+  const optionalConfigObject = {
+    title: 'Authentication Required', // Android
+    imageColor: '#e00606', // Android
+    imageErrorColor: '#ff0000', // Android
+    sensorDescription: 'Touch sensor', // Android
+    sensorErrorDescription: 'Failed', // Android
+    cancelText: 'Cancel', // Android
+  };
+
+  var Fingerprint = () => {
+    TouchID.authenticate('to demo this react-native component', optionalConfigObject)
+      .then(success => {
+        console.log('Success', success)
+        setAuth(success)
+      })
+      .then(() => setIsEnabledFingerprint(!isEnabledFingerprint))
+      .catch(error => {
+        console.log('Error', error)
+      });
+  }
+  
+  var TouchIDSupported = () => {
+    TouchID.isSupported(optionalConfigObject)
+    .then(biometryType => {
+      // Success code
+      if (biometryType === 'FaceID') {
+          console.log('FaceID is supported.')
+      } else {
+          console.log('TouchID is supported.')
+          Fingerprint()
+          setFr(!fr)
+      }
+    })
+    .then(() => AsyncStorage.setItem("isShowFingerprint" , `${isEnabledFingerprint}`))
+    .catch(error => {
+      // Failure code
+      alert('TouchID is not supported')
+      setIsEnabledFingerprint(false)
+    });
+  }
+
+  useEffect(() => {
+    setIsEnabledFingerprint(fr === true ? true : false);
+  }, []) 
+
 
     return (
       <View style={{flex: 1}}>
@@ -64,98 +130,9 @@ var Settings = (props) => {
         </Modal>
         <UIHeader title={'Settings'} />
         <ScrollView>
-          <View
-            style={{
-              height: 40,
-              backgroundColor: 'rgba(0, 0, 0, 0.1)',
-              justifyContent: 'center',
-              paddingLeft: 10,
-            }}>
-            <Text
-              style={{
-                color: colors.primary,
-              }}>
-              Common
-            </Text>
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingVertical: 10,
-            }}>
-            <Icon
-              style={{
-                paddingLeft: 10,
-              }}
-              name="globe"
-              size={20}
-            />
-            <Text
-              style={{
-                marginLeft: 10,
-              }}>
-              Language
-            </Text>
-            <View style={{flex: 1}}></View>
-            <Text
-              style={{
-                marginHorizontal: 10,
-                opacity: 0.5,
-              }}>
-              English
-            </Text>
-            <Icon
-              style={{
-                paddingEnd: 10,
-                opacity: 0.5,
-              }}
-              name="chevron-right"
-              size={20}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingVertical: 10,
-            }}>
-            <Icon
-              style={{
-                paddingLeft: 10,
-              }}
-              name="cloud"
-              size={20}
-            />
-            <Text
-              style={{
-                marginLeft: 10,
-              }}>
-              Environment
-            </Text>
-            <View style={{flex: 1}}></View>
-            <Text
-              style={{
-                marginHorizontal: 10,
-                opacity: 0.5,
-              }}>
-              Production
-            </Text>
-            <Icon
-              style={{
-                paddingEnd: 10,
-                opacity: 0.5,
-              }}
-              name="chevron-right"
-              size={20}
-            />
-          </View>
 
           <View
-            style={{
-              height: 40,
-              backgroundColor: 'rgba(0, 0, 0, 0.1)',
-              justifyContent: 'center',
-              paddingLeft: 10,
-            }}>
+            style={styles.title}>
             <Text
               style={{
                 color: colors.primary,
@@ -163,23 +140,24 @@ var Settings = (props) => {
               Account
             </Text>
           </View>
-          <View
+          <TouchableOpacity onPress={() => AsyncStorage.getItem('token').then(response => navigation.navigate("Profile", {token: response}))}
             style={{
               flexDirection: 'row',
               paddingVertical: 10,
             }}>
-            <Icon
+            <FontAwesomeIcon
               style={{
-                paddingLeft: 10,
+                marginLeft: 10,
+                color: colors.disable
               }}
-              name="phone"
+              icon={faCircleInfo}
               size={20}
             />
             <Text
               style={{
                 marginLeft: 10,
               }}>
-              Phone number
+              Change your information
             </Text>
             <View style={{flex: 1}}></View>
             <Icon
@@ -190,35 +168,7 @@ var Settings = (props) => {
               name="chevron-right"
               size={20}
             />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              paddingVertical: 10,
-            }}>
-            <Icon
-              style={{
-                paddingLeft: 10,
-              }}
-              name="envelope"
-              size={20}
-            />
-            <Text
-              style={{
-                marginLeft: 10,
-              }}>
-              Email
-            </Text>
-            <View style={{flex: 1}}></View>
-            <Icon
-              style={{
-                paddingEnd: 10,
-                opacity: 0.5,
-              }}
-              name="chevron-right"
-              size={20}
-            />
-          </View>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               setModalVisible(true)
@@ -227,11 +177,12 @@ var Settings = (props) => {
               flexDirection: 'row',
               paddingVertical: 10,
             }}>
-            <Icon
+            <FontAwesomeIcon
               style={{
-                paddingLeft: 10,
+                marginLeft: 10,
+                color: colors.disable
               }}
-              name="code"
+              icon={faSignOut}
               size={20}
             />
             <Text
@@ -252,12 +203,7 @@ var Settings = (props) => {
           </TouchableOpacity>
 
           <View
-            style={{
-              height: 40,
-              backgroundColor: 'rgba(0, 0, 0, 0.1)',
-              justifyContent: 'center',
-              paddingLeft: 10,
-            }}>
+            style={styles.title}>
             <Text
               style={{
                 color: colors.primary,
@@ -318,14 +264,13 @@ var Settings = (props) => {
               thumbColor={
                 isEnabledFingerprint ? colors.primary : colors.disable
               }
-              // ios_backgroundColor="#3e3e3e"
               onValueChange={() => {
-                setIsEnabledFingerprint(!isEnabledFingerprint);
+                TouchIDSupported()
               }}
               value={isEnabledFingerprint}
             />
           </View>
-          <View
+          <TouchableOpacity onPress={() => navigation.navigate("ForgetPassword")}
             style={{
               flexDirection: 'row',
               paddingVertical: 10,
@@ -344,26 +289,18 @@ var Settings = (props) => {
               Change password
             </Text>
             <View style={{flex: 1}}></View>
-            <Switch style={{marginEnd: 10,}}
-              trackColor={{false: '#767577', true: colors.primary}}
-              thumbColor={
-                isEnabledChangePassword ? colors.primary : colors.disable
-              }
-              // ios_backgroundColor="#3e3e3e"
-              onValueChange={() => {
-                setIsEnabledChangePassword(!isEnabledChangePassword);
+            <Icon
+              style={{
+                paddingEnd: 10,
+                opacity: 0.5,
               }}
-              value={isEnabledChangePassword}
+              name="chevron-right"
+              size={20}
             />
-          </View>
+          </TouchableOpacity>
 
           <View
-            style={{
-              height: 40,
-              backgroundColor: 'rgba(0, 0, 0, 0.1)',
-              justifyContent: 'center',
-              paddingLeft: 10,
-            }}>
+            style={styles.title}>
             <Text
               style={{
                 color: colors.primary,
@@ -371,7 +308,10 @@ var Settings = (props) => {
               Misc
             </Text>
           </View>
-          <View
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('TermOfUse')
+            }}
             style={{
               flexDirection: 'row',
               paddingVertical: 10,
@@ -398,8 +338,11 @@ var Settings = (props) => {
               name="chevron-right"
               size={20}
             />
-          </View>
-          <View
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('ContactUs')
+            }}
             style={{
               flexDirection: 'row',
               paddingVertical: 10,
@@ -415,7 +358,7 @@ var Settings = (props) => {
               style={{
                 marginLeft: 10,
               }}>
-              Open source licenses
+              Contact Us
             </Text>
             <View style={{flex: 1}}></View>
             <Icon
@@ -426,7 +369,7 @@ var Settings = (props) => {
               name="chevron-right"
               size={20}
             />
-          </View>
+          </TouchableOpacity>
           <View style={{height:100,}}></View>
         </ScrollView>
       </View>
@@ -478,7 +421,15 @@ var styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 10,
     fontSize: 18,
-  }
+  },
+
+
+  title: {
+    height: 40,
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    justifyContent: 'center',
+    paddingLeft: 10,
+  },
 })
 
 export default Settings;

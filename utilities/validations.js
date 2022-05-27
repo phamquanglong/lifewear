@@ -24,3 +24,8 @@ export var isValidResetCode = (resetCode) => {
   if (resetCode.length == 6) return true
   else return false
 }
+
+export var isValidPhone = (phone) => {
+  if (phone !== null) return phone.length >= 10 && phone.length <= 11 ? true : false
+  else return false
+}

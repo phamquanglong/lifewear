@@ -35,8 +35,8 @@ var ResetPassword = (props) => {
 
       var Reset = (email, resetCode, password) => {
         console.log(email, resetCode, password)
-        return fetch('https://lifewear.mn07.xyz/api/reset_password', {
-          method: 'POST',
+        fetch('https://lifewear.mn07.xyz/api/reset_password', {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
@@ -51,7 +51,7 @@ var ResetPassword = (props) => {
           .then(response => response.json())
         //   .then(json => Promise.resolve(json))
           .then(data => showToast(data))
-        //   .catch(err => Promise.reject(err));
+          .catch(err => alert(err));
       };
 
     return (

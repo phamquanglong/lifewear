@@ -42,7 +42,7 @@ var ForgetPassword = (props) => {
         }).then((response) => response.json())
         .then((json) => Promise.resolve(json))
         .then((data) => showToast(data))
-        .catch((err) => Promise.reject(err));
+        .catch((err) => console.error(err));
       }
 
     var isValidOK = () => email.length > 0 && isValidEmail(email) == true

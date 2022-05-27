@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {
     View,
     Text,
@@ -18,9 +18,11 @@ import {
   firebaseDatabaseRef,
   firebaseDatabase,
   onValue,
+  update,
 } from '../Firebase/Firebase';
 
 var Messenger = (props) => {
+
     const [message, setMessage] = useState([])
     var [typedText, setTypedText] = useState('')
 
@@ -30,9 +32,11 @@ var Messenger = (props) => {
     var {
       name,
       url,
+      accessToken,
+      numberUnreadMessage,
+      userId,
     } = props.route.params.user
 
-    console.log(props)
 
     useEffect(() => {
       onValue(firebaseDatabaseRef(firebaseDatabase, 'chats'), async snapshot => {
@@ -40,7 +44,7 @@ var Messenger = (props) => {
           let snapshotObject = snapshot.val()
           
           let stringUser = await AsyncStorage.getItem("user")
-          let myUserId = JSON.parse(stringUser).userId
+          let myUserId = JSON.parse(stringUser).userId !== undefined ? JSON.parse(stringUser).userId : JSON.parse(stringUser).uid
           var updateMessage = Object.keys(snapshotObject).filter(item => item.includes(myUserId))
           .filter(item => item.includes(props.route.params.user.userId))
           .map(eachKey => {
@@ -77,6 +81,7 @@ var Messenger = (props) => {
       })
 
     }, [])
+
 
     return (
       <View style={{flex: 1}}>
@@ -194,21 +199,56 @@ var Messenger = (props) => {
                 timestamp: new Date().getTime(),
                 isSender: null,
                 isShowTimestamp: null,
-              };
-              let stringUser = await AsyncStorage.getItem('user');
-              let myUserId = JSON.parse(stringUser).userId;
-              let myfiendUserId = props.route.params.user.userId;
-              Keyboard.dismiss();
+              }
+              let stringUser = await AsyncStorage.getItem('user')
+              let myUserId = JSON.parse(stringUser).userId !== undefined ? JSON.parse(stringUser).userId : JSON.parse(stringUser).uid
+              let myfriendUserId = props.route.params.user.userId
+              Keyboard.dismiss()
               firebaseDatabaseSet(
                 firebaseDatabaseRef(
                   firebaseDatabase,
-                  `chats/${myUserId}-${myfiendUserId}/${newMessengerObject.timestamp}`,
+                  `chats/${myUserId}-${myfriendUserId}/${newMessengerObject.timestamp}`,
                 ),
-                newMessengerObject,
+                // newMessengerObject
+                {
+                  url: 'https://randomuser.me/api/portraits/thumb/men/32.jpg',
+                  showUrl: false,
+                  messages: typedText,
+                  timestamp: new Date().getTime(),
+                  isSender: null,
+                  isShowTimestamp: null,
+                }
               )
-              // .then(props.route.params.setEmail(name))
-              .then(props.route.params.setFirstMessage(typedText))
-              .then(() => setTypedText(''));
+              setTypedText('');
+              let newFirstMessage = {
+                firstMessage: typedText,
+                receiverId: myfriendUserId,
+                timestamp: new Date().getTime(),
+              }
+              firebaseDatabaseSet(
+                firebaseDatabaseRef(
+                  firebaseDatabase,
+                  `firstMessage/${myUserId}/${myfriendUserId}/`,
+                ),
+                // newFirstMessage
+                {
+                  firstMessage: typedText,
+                  receiverId: myfriendUserId,
+                  timestamp: new Date().getTime(),
+                }
+              )
+              firebaseDatabaseSet(
+                firebaseDatabaseRef(
+                  firebaseDatabase,
+                  `firstMessage/${myfriendUserId}/${myUserId}/`,
+                ),
+                // newFirstMessage
+                {
+                  firstMessage: typedText,
+                  receiverId: myfriendUserId,
+                  timestamp: new Date().getTime(),
+                }
+              )
             }}>
             <Icon name="send" color="white" size={20} />
           </TouchableOpacity>

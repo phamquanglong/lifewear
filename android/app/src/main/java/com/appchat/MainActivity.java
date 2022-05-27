@@ -1,5 +1,6 @@
 package com.appchat;
 
+import com.reactlibrary.RNMomosdkPackage;
 import com.facebook.react.ReactActivity;
 
 public class MainActivity extends ReactActivity {

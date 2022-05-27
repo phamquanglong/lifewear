@@ -23,7 +23,7 @@ var UIHeader = (props) => {
       onPressLeftIcon,
       onPressRightIcon} = props
     return <View style={{
-        height: 50,
+        height: 60,
         backgroundColor: colors.primary,
         flexDirection: 'row',
         justifyContent: 'space-between',

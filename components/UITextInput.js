@@ -6,13 +6,15 @@ import {
     Keyboard,
 } from 'react-native'
 
-
 var UITextInput = (props) => {
+
     return <TextInput
+    keyboardType={props.keyboardType}
     style={styles.textInput}
     placeholder={props.placeholder}
     autoFocus={props.autoFocus}
     onChangeText={props.onChangeText}
+    value={props.value}
     />
 }
 

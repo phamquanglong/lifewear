@@ -1,33 +1,42 @@
 {
   "project_info": {
-    "project_number": "838198791135",
-    "project_id": "appchat-190a7",
-    "storage_bucket": "appchat-190a7.appspot.com"
+    "project_number": "931519641953",
+    "firebase_url": "https://lifewear-348903-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "lifewear-348903",
+    "storage_bucket": "lifewear-348903.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:838198791135:android:8021528a27f21f9722926a",
+        "mobilesdk_app_id": "1:931519641953:android:a7ef5240c7a1393f282d20",
         "android_client_info": {
           "package_name": "com.appchat"
         }
       },
       "oauth_client": [
         {
-          "client_id": "838198791135-su15mm8vv8eq814egovq87c7tub9de9m.apps.googleusercontent.com",
+          "client_id": "931519641953-tgs85hi7d6haith20o9k5pqsb7udmhmq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.appchat",
+            "certificate_hash": "55b8b6e3bdf289d302172796d3727b47d9b32ea3"
+          }
+        },
+        {
+          "client_id": "931519641953-hr2elkkbniagjftgb0hpn5op5use3c8v.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCj1S3yZcxlo39DubrSqebWo8q9MYeuB78"
+          "current_key": "AIzaSyDomcxPBOSNmKbhX14512btFV8JUvCOZ3c"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "838198791135-su15mm8vv8eq814egovq87c7tub9de9m.apps.googleusercontent.com",
+              "client_id": "931519641953-hr2elkkbniagjftgb0hpn5op5use3c8v.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

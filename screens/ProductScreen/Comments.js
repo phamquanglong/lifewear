@@ -14,8 +14,9 @@ var Comments = (props) => {
             flex: 1,
             backgroundColor: 'white',
             marginBottom: 5,
-            marginTop: index < 1 ? 5 : 0,
+            marginTop: 5,
             padding: 5,
+            marginHorizontal: 5,
             borderRadius: 10,
         }}>
         <View 
@@ -24,7 +25,7 @@ var Comments = (props) => {
             alignItems: 'center',
         }}>
             <Image source={{
-                uri: item.user.avatar,
+                uri: item.author.avatar,
             }} style={{
                 borderRadius: 50,
                 width: 40,
@@ -33,16 +34,16 @@ var Comments = (props) => {
                 borderColor: 'black',
             }}/>
             <View style={{marginStart: 10,}}>
-                <Text>{item.user.first_name} {item.user.last_name}</Text>
+                <Text>{item.author.first_name} {item.author.last_name}</Text>
                 <FiveStars numberOfStars={item.rating}/>
             </View>
         </View>
         <Text style={{
             marginVertical: 10,
         }}>{item.comment}</Text>
-        {item.user.avatar != null && <Image
+        {/* {item.author.avatar != null && <Image
         style={{height: 100, width: 100}}
-        source={{uri: item.user.avatar}}/>}
+        source={{uri: item.author.avatar}}/>} */}
     </View>
 }
 
