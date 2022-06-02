@@ -3,12 +3,15 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { colors } from '../../../constants';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { useNavigation } from '@react-navigation/native'
 
 
 var OrderItem = (props) => {
     var { icon, text, index, count } = props
+    var navigation = useNavigation()
 
-    return <TouchableOpacity style={[
+    return <TouchableOpacity onPress={() => navigation.navigate('OrderScreen', {title: text})}
+    style={[
         styles.btn,
         { marginStart: index%2==0 ? 0 : 5, marginEnd: index%2==0 ? 5 : 0 }
     ]}>

@@ -284,6 +284,7 @@ var FoodList = props => {
                               ? 'white'
                               : colors.primary,
                             fontSize: 20,
+                            fontWeight: 'bold',
                           }}>
                           {item.name}
                         </Text>

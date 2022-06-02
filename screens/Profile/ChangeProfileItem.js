@@ -48,7 +48,7 @@ var ChangeProfileItem = (props) => {
             onChangeText={(text) => {
               setTypedText(text)
               if (isValid !== undefined) {
-                isValid(typeText) == false ? setError('text input is invalid') : setError('')
+                isValid(typeText) == false ? setError('Text input is invalid') : setError('')
               }
             }}
           />
@@ -90,7 +90,10 @@ var styles = StyleSheet.create({
         fontSize: 18,
     },
     error_text: {
-        color: colors.danger,
+        alignSelf: 'center',
+        padding: 10,
+        color: 'white',
+        backgroundColor: colors.danger,
     }
 })
 

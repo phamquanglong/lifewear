@@ -15,6 +15,11 @@ import {auth,
     createUserWithEmailAndPassword,
     onAuthStateChanged,
   } from '../Firebase/Firebase'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { 
+  faGooglePlusIcon,
+} from '@fortawesome/free-solid-svg-icons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 var SignInWithGoogle = (props) => {
     var [userInfo, setUserInfo] = useState({})
@@ -102,36 +107,26 @@ var SignInWithGoogle = (props) => {
     }
 
     return (
-      <View style={styles.container}>
-        <Image
-          source={{uri: userInfo.photo}}
-          style={{width: 100, height: 100}}
-        />
-        {/* <Text>{userInfo.name}</Text> */}
-        <Text>{userInfo.email}</Text>
         <TouchableOpacity
           style={styles.btnGoogle}
           onPress={() => doLogin('google')}>
-          <Text style={styles.text}>Google+</Text>
+          <Icon name="google" size={25} style={styles.iconGoogle}/>
         </TouchableOpacity>
-      </View>
     );
 
 }
 
 var styles = StyleSheet.create({
-    container: {
-        padding: 10,
-        flex: 1,
-        backgroundColor: colors.primary,
-        flexDirection: 'row',
-    },
     btnGoogle: {
-        flex: 1,
+        // flex: 1,
         backgroundColor: colors.primary,
+        padding: 10,
+        borderRadius: 5,
+        margin: 5,
+        paddingBottom: 8,
     },
-    text: {
-        color: 'white',
+    iconGoogle: {
+      color: 'white',
     }
 })
 

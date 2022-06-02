@@ -20,6 +20,7 @@ import AddAddress from "./Profile/AddAddress/AddAddress"
 import AddressSelector from "./Profile/AddAddress/AddressSelector";
 import WishListScreen from "./WishList/WishListScreen";
 import PaymentSuccess from "./Payment/PaymentSuccess";
+import OrderScreen from "./Profile/Orders/OrderScreen";
 
 
 export {
@@ -44,5 +45,6 @@ export {
     AddAddress,
     AddressSelector,
     WishListScreen,
-    PaymentSuccess
+    PaymentSuccess,
+    OrderScreen
 }

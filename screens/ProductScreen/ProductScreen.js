@@ -4,7 +4,9 @@ import React, {
   useRef,
   useContext,
   createContext,
-  useMemo
+  useMemo,
+  useCallback,
+  memo,
 } from 'react';
 import {
   View,
@@ -43,69 +45,21 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import {Dimensions} from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import { useDispatch } from 'react-redux';
-import { addCounter, setBuyNow } from '../../Store/actions';
-
+import {useDispatch} from 'react-redux';
+import {addCounter, setBuyNow} from '../../Store/actions';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 LogBox.ignoreLogs([
   'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation because it can break windowing and other functionality - use another VirtualizedList-backed container instead.',
-  'You seem to update the renderers prop(s) of the "RenderHTML" component in short periods of time, causing costly tree rerenders'
+  'You seem to update the renderers prop(s) of the "RenderHTML" component in short periods of time, causing costly tree rerenders',
 ]);
 
 export var colorContext = createContext();
 
-var ProductScreen = props => {
-  var [isLoading, setIsLoading] = useState(true);
-  var [details, setDetails] = useState({});
-  var [reviewsList, setReviewsList] = useState([]);
-  var [isShowFullScreenImage, setIsShowFullScreenImage] = useState(false);
-  var [size, setSize] = useState()
-  var [color, setColor] = useState()
-
-  var imagesList = []
-  var [imgList, setImgList] = useState([]);
-
-  var getDetails = () => {
-    fetch(
-      `https://lifewear.mn07.xyz/api/products/${props.route.params.item.id}`,
-      {
-        headers: {
-          Accept: 'application/json',
-        },
-      },
-    )
-      .then(response => response.json())
-      .then(json => {
-        setDetails(json);
-        getReviews(json.id);
-        json.images.map(image => imagesList.push({
-          url: image.image
-        }))
-      })
-      .then(() => setImgList(imagesList.slice(0, 5)))
-      .then(() => setIsLoading(false))
-      .catch(err => console.log(err));
-  };
-
-  useEffect(() => {
-    getDetails();
-    return () => {
-      setDetails({});
-    };
-  }, []);
-
-  var [isActive, setIsActive] = useState(true);
-  var [isActiveWaranty, setIsActiveWaranty] = useState(false);
-
-  var {navigation, route} = props;
-  var {navigate, goBack, push, dispatch} = navigation;
-
-  const scrollRef = useRef();
-
-  var [atTop, setAtTop] = useState(true);
+var WebDisplay = React.memo(function WebDisplay(props) {
+  const { details } = props
 
   const source = {
     html: `${details.description}`,
@@ -133,6 +87,73 @@ var ProductScreen = props => {
     }),
   };
 
+  return (
+    <View
+      style={{
+        margin: 10,
+      }}>
+      <RenderHtml
+        contentWidth={width * 0.95}
+        source={source}
+        renderersProps={renderersProps}
+        customHTMLElementModels={customHTMLElementModels}
+      />
+    </View>
+  );
+})
+
+var ProductScreen = props => {
+  var [isLoading, setIsLoading] = useState(true);
+  var [details, setDetails] = useState({});
+  var [reviewsList, setReviewsList] = useState([]);
+  var [isShowFullScreenImage, setIsShowFullScreenImage] = useState(false);
+  var [size, setSize] = useState();
+  var [color, setColor] = useState();
+
+  var imagesList = [];
+  var [imgList, setImgList] = useState([]);
+
+  var getDetails = useCallback(() => {
+    fetch(
+      `https://lifewear.mn07.xyz/api/products/${props.route.params.item.id}`,
+      {
+        headers: {
+          Accept: 'application/json',
+        },
+      },
+    )
+      .then(response => response.json())
+      .then(json => {
+        setDetails(json);
+        getReviews(json.id);
+        json.images.map(image =>
+          imagesList.push({
+            url: image.image,
+          }),
+        );
+      })
+      .then(() => setImgList(imagesList.slice(0, 5)))
+      .then(() => setIsLoading(false))
+      .catch(err => console.log(err));
+  }, [size, color]);
+
+  useEffect(() => {
+    getDetails();
+    return () => {
+      setDetails({});
+    };
+  }, []);
+
+  var [isActive, setIsActive] = useState(true);
+  var [isActiveWaranty, setIsActiveWaranty] = useState(false);
+
+  var {navigation, route} = props;
+  var {navigate, goBack, push, dispatch} = navigation;
+
+  const scrollRef = useRef();
+
+  var [atTop, setAtTop] = useState(true);
+
   var [productVariantId, setProductVariantId] = useState();
   var [qty, setQty] = useState();
 
@@ -153,22 +174,23 @@ var ProductScreen = props => {
 
     if (productVariantId !== undefined && qty > 0) {
       axios
-      .request(options)
-      .then(() =>
-        Toast.show({
-          type: 'success',
-          text1: 'Add product successfully',
-          text2: 'Check your cart! 👋',
-        }),
-        dispatchHandler(1)
-      )
-      .catch(err => console.error(err.response.data));
-    }
-    else Toast.show({
-      type: 'error',
-      text1: 'Add product fail',
-      text2: 'Choose size, color and quantity first! 👋',
-    })
+        .request(options)
+        .then(
+          () =>
+            Toast.show({
+              type: 'success',
+              text1: 'Add product successfully',
+              text2: 'Check your cart! 👋',
+            }),
+          dispatchHandler(1),
+        )
+        .catch(err => console.error(err.response.data));
+    } else
+      Toast.show({
+        type: 'error',
+        text1: 'Add product fail',
+        text2: 'Choose size, color and quantity first! 👋',
+      });
   };
 
   var getReviews = product_id => {
@@ -184,37 +206,41 @@ var ProductScreen = props => {
       .catch(error => console.error(error));
   };
 
-  var buyNow = (item) => {
-    console.log({color, size})
+  var buyNow = item => {
+    console.log({color, size});
     if (productVariantId !== undefined && qty > 0) {
-      var arr = []
+      var arr = [];
       arr.push({
         ...item,
         color: color,
         size: size,
-        cart_quantity: qty
-      })
-      navigate('Payment', {listProducts: arr})
-    }
-    else Toast.show({
-      type: 'error',
-      text1: 'Add product fail',
-      text2: 'Choose size, color and quantity first! 👋',
-    })
-  }
+        cart_quantity: qty,
+      });
+      navigate('Payment', {listProducts: arr});
+    } else
+      Toast.show({
+        type: 'error',
+        text1: 'Add product fail',
+        text2: 'Choose size, color and quantity first! 👋',
+      });
+  };
 
   const dispatchRedux = useDispatch();
 
-  const dispatchHandler = (num) => {
-    dispatchRedux(addCounter(num))
-  }
+  const dispatchHandler = num => {
+    dispatchRedux(addCounter(num));
+  };
 
   return isLoading == false ? (
     <colorContext.Provider value={details}>
       <Modal visible={isShowFullScreenImage} transparent={true}>
-        <ImageViewer imageUrls={imgList} enableSwipeDown={true} onSwipeDown={() => {
-          setIsShowFullScreenImage(false)
-        }}/>
+        <ImageViewer
+          imageUrls={imgList}
+          enableSwipeDown={true}
+          onSwipeDown={() => {
+            setIsShowFullScreenImage(false);
+          }}
+        />
       </Modal>
       <View
         style={{
@@ -230,8 +256,7 @@ var ProductScreen = props => {
             }}>
             <SliderBox
               onCurrentImagePressed={() => {
-                setIsShowFullScreenImage(true)
-                console.log(imgList)
+                setIsShowFullScreenImage(true);
               }}
               autoplay={true}
               circleLoop={true}
@@ -278,13 +303,13 @@ var ProductScreen = props => {
                     {details.price.toLocaleString('vi-VN', {
                       style: 'currency',
                       currency: 'VND',
-                    }) }
+                    })}
                   </Text>
                   <Text
                     style={{
                       marginStart: 10,
                       fontSize: 15,
-                      textDecorationLine: 'line-through'
+                      textDecorationLine: 'line-through',
                     }}>
                     {details.sale_price.toLocaleString('vi-VN', {
                       style: 'currency',
@@ -388,17 +413,7 @@ var ProductScreen = props => {
               </TouchableOpacity>
             </View>
             {isActive ? (
-              <View
-                style={{
-                  margin: 10,
-                }}>
-                <RenderHtml
-                  contentWidth={width * 0.95}
-                  source={source}
-                  renderersProps={renderersProps}
-                  customHTMLElementModels={customHTMLElementModels}
-                />
-              </View>
+              <WebDisplay details={details}/>
             ) : (
               <View style={{margin: 10}}>
                 <Text
@@ -569,7 +584,8 @@ var ProductScreen = props => {
               +
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigate('Chat')}
+          <TouchableOpacity
+            onPress={() => navigate('Chat')}
             style={{
               borderWidth: 2,
               borderColor: colors.success,
@@ -624,4 +640,4 @@ var styles = StyleSheet.create({
   },
 });
 
-export default ProductScreen;
+export default memo(ProductScreen);

@@ -49,7 +49,6 @@ var Settings = (props) => {
   }
 
   var [isEnabledLockApp, setIsEnabledLockApp] = useState(true)
-  var [isEnabledChangePassword, setIsEnabledChangePassword] = useState(true)
   var [isEnabledFingerprint, setIsEnabledFingerprint] = useState(isEnabledFingerprint)
   var [modalVisible, setModalVisible] = useState(false)
   var [auth, setAuth] = useState(false)
@@ -72,6 +71,7 @@ var Settings = (props) => {
         setAuth(success)
       })
       .then(() => setIsEnabledFingerprint(!isEnabledFingerprint))
+      .then(() => setFr(!fr))
       .catch(error => {
         console.log('Error', error)
       });
@@ -86,7 +86,6 @@ var Settings = (props) => {
       } else {
           console.log('TouchID is supported.')
           Fingerprint()
-          setFr(!fr)
       }
     })
     .then(() => AsyncStorage.setItem("isShowFingerprint" , `${isEnabledFingerprint}`))

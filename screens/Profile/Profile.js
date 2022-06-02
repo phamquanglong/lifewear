@@ -122,7 +122,7 @@ var Profile = props => {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data);
+        alert(data.errors.dob);
         setUpdate(false);
       })
       .catch(err => console.log(err));

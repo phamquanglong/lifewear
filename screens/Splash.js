@@ -54,6 +54,7 @@ var Splash = (props) => {
             width: 100,
             height: 100,
             opacity: logoOpacity,
+            borderRadius: 100,
         }}
         source={images.fire}/>
         <Animated.Text style={{

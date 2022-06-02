@@ -1,5 +1,6 @@
 export default {
-    primary: '#de601d',
+    // primary: '#de601d',
+    primary: '#FF4174',
     placeholder: 'rgba(0,0,0,0.5)',
     facebook: '#105fc7',
     google: '#de601d',

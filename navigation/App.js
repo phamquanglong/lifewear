@@ -21,7 +21,8 @@ import {
   Payment,
   AddAddress,
   AddressSelector,
-  PaymentSuccess
+  PaymentSuccess,
+  OrderScreen
 } from '../screens/';
 import UITab from './UITab';
 import Toast from 'react-native-toast-message';
@@ -49,6 +50,7 @@ var App = props => {
             screenOptions={{
               headerShown: false,
             }}>
+            <Stack.Screen name="OrderScreen" component={OrderScreen}/>
             <Stack.Screen name="PaymentSuccess" component={PaymentSuccess}/>
             <Stack.Screen name="AddressSelector" component={AddressSelector} />
             <Stack.Screen name="AddAddress" component={AddAddress} />

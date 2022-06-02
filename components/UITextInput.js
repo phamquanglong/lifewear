@@ -25,6 +25,7 @@ var styles = StyleSheet.create({
         flex: 1,
         height: 40,
         borderRadius: 5,
+        paddingStart: 10,
     }
 })
 

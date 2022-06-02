@@ -133,7 +133,7 @@ var Register = (props) => {
           </View>
           <View
             style={{
-              flex: 0.6,
+              flex: 0.7,
               backgroundColor: 'white',
               paddingVertical: 10,
               marginHorizontal: 10,
@@ -239,6 +239,7 @@ var Register = (props) => {
                 <Picker
                   style={{
                     marginHorizontal: 5,
+                    marginStart: 20,
                   }}
                   mode={'dropdown'}
                   selectedValue={selectedValue}
@@ -364,48 +365,6 @@ var Register = (props) => {
               </TouchableOpacity>
             </View>
           </View>
-          {/* {keyboardIsShown == false && (
-            <View
-              style={{
-                flex: 0.1,
-              }}>
-              <View
-                style={{
-                  height: 50,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginHorizontal: 20,
-                }}>
-                <View
-                  style={{height: 1, backgroundColor: 'black', flex: 1}}></View>
-                <Text
-                  style={{
-                    padding: 10,
-                    color: 'black',
-                    fontSize: 13,
-                    alignSelf: 'center',
-                  }}>
-                  User other method?
-                </Text>
-                <View
-                  style={{height: 1, backgroundColor: 'black', flex: 1}}></View>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                }}>
-                <Icon
-                  name="facebook-square"
-                  size={50}
-                  color={colors.facebook}></Icon>
-                <View style={{width: 20}}></View>
-                <TouchableOpacity>
-                  <Icon name="google" size={50} color="white"></Icon>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )} */}
         </KeyboardAwareScrollView>
       </View>
     );
