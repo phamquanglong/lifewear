@@ -7,9 +7,13 @@ import {
   FlatList,
   ActivityIndicator,
   Modal,
+  TouchableHighlight
 } from 'react-native';
+import {Picker} from '@react-native-picker/picker'
 import {UISearchBar, UIGoBackButton} from '../../components';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import {faClose} from '@fortawesome/free-solid-svg-icons'
 import {colors} from '../../constants';
 import ProductItem from '../ProductsGrid/ProductItem';
 import {StackActions, useScrollToTop} from '@react-navigation/native';
@@ -70,17 +74,19 @@ var CategoryScreen = props => {
   ]);
   var [oldSizes, setOldSizes] = useState(sizes);
 
-  var [minPrice, setMinPrice] = useState(minPrice);
-  var [maxPrice, setMaxPrice] = useState(maxPrice);
+  var [minPrice, setMinPrice] = useState(0);
+  var [maxPrice, setMaxPrice] = useState(0);
+  var [orderByPrice, setOrderByPrice] = useState("");
 
   var [productsFilter, setProductsFilter] = useState(productsFilter);
   var [isFiltered, setIsFiltered] = useState(false);
 
-  var getProductsByCategory = id => {
+  var getProductsByCategory = (id, token) => {
     fetch(`https://lifewear.mn07.xyz/api/categories/${id}`, {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token
       },
     })
       .then(response => response.json())
@@ -104,15 +110,15 @@ var CategoryScreen = props => {
   };
 
   useEffect(() => {
-    getProductsByCategory(props.route.params.idCategory);
+    AsyncStorage.getItem('token').then(response => getProductsByCategory(props.route.params.idCategory, response))
   }, []);
 
   var filterProducts = id => {
-    console.log(`${getSize()}, ${minPrice}, ${maxPrice}`);
+    console.log(`${getSize()}, ${minPrice}, ${maxPrice}, ${getOrder()}`);
     const options = {
       method: 'GET',
       url: `https://lifewear.mn07.xyz/api/categories/${id}`,
-      params: {size: getSize(), price_min: minPrice, price_max: maxPrice},
+      params: {size: getSize(), price_min: minPrice, price_max: maxPrice, sortby: 'price', order: getOrder()},
       headers: {'Content-Type': 'application/json', Accept: 'application/json'},
     };
 
@@ -126,18 +132,21 @@ var CategoryScreen = props => {
       .catch(err => console.log(err));
   };
 
+  var getOrder = () => {
+    return orderByPrice == 1 ? "desc" : "asc"
+  }
+
+  console.log(orderByPrice)
+
   return isLoading == false ? (
     <View style={{flex: 1}}>
       <Modal animationType="slide" visible={isShowModal} transparent={true}>
-        <TouchableOpacity
-          onPress={() => {
-            setIsShowModal(false);
-          }}
+        <View
           style={{flex: 1}}>
           <View
             style={{
               width: '80%',
-              height: '40%',
+              height: '45%',
               backgroundColor: 'white',
               position: 'absolute',
               top: '12%',
@@ -146,6 +155,11 @@ var CategoryScreen = props => {
               elevation: 10,
               padding: 10,
             }}>
+            <TouchableOpacity style={{position: 'absolute', top: 10, right: 10}}
+            onPress={() => setIsShowModal(false)}>
+              <FontAwesomeIcon icon={faClose} size={20}/>
+            </TouchableOpacity>
+            <View style={{flex: 1}}></View>
             <Text style={styles.label}>Size</Text>
             <FlatList
               contentContainerStyle={{
@@ -191,9 +205,16 @@ var CategoryScreen = props => {
                 );
               }}
             />
+
             <Text style={styles.label}>Range price</Text>
-            <Text>Min: {minPrice}</Text>
-            <Text>Max: {maxPrice}</Text>
+            <Text>Min: {minPrice.toLocaleString('vi-VN', {
+              style: 'currency',
+              currency: 'VND',
+            })}</Text>
+            <Text>Max: {maxPrice.toLocaleString('vi-VN', {
+              style: 'currency',
+              currency: 'VND',
+            })}</Text>
 
             <RangeSlider
               renderThumb={() => {
@@ -211,7 +232,7 @@ var CategoryScreen = props => {
               renderNotch={() => {
                 return <View></View>;
               }}
-              style={{marginVertical: 10, marginBottom: 100}}
+              style={{marginVertical: 10}}
               gravity={'center'}
               min={50000}
               max={999000}
@@ -223,6 +244,23 @@ var CategoryScreen = props => {
                 setMaxPrice(high);
               }}
             />
+
+            <Text style={styles.label}>Order by price</Text>
+            <Picker
+            style={{
+              paddingStart: 10,
+              backgroundColor: 'rgba(0, 0, 0, 0.05)',
+              marginVertical: 10,
+            }}
+            mode={'dropdown'}
+            selectedValue={orderByPrice}
+            onValueChange={(itemValue, itemIndex) => {
+              setOrderByPrice(itemValue)
+            }}>
+              <Picker.Item label={"increase"} value={0}/>
+              <Picker.Item label={"decrease"} value={1}/>
+            </Picker>
+
             <TouchableOpacity
               style={{
                 padding: 10,
@@ -233,10 +271,11 @@ var CategoryScreen = props => {
               onPress={() => {
                 filterProducts(props.route.params.idCategory);
               }}>
-              <Text style={{color: 'white'}}>Filter</Text>
+              <Text style={{color: 'white'}}>Apply</Text>
             </TouchableOpacity>
+
           </View>
-        </TouchableOpacity>
+        </View>
       </Modal>
       <UISearchBar navigation={navigation} setSearchText={setSearchText} />
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -278,15 +317,15 @@ var CategoryScreen = props => {
                 item={item}
                 index={index}
                 onPress={() => {
-                  AsyncStorage.getItem('token').then(response => item.isLiked
+                  AsyncStorage.getItem('token').then(response => item.wished
                     ? deleteWishlist(item.id, response, wishListData) : addWishList(item.id, response, wishListData))
                   var cloneProducts = productsData.map(product => {
                     if (item.name == product.name) {
                       return {
                         ...product,
-                        isLiked:
-                          product.isLiked == false ||
-                          product.isLiked == undefined
+                        wished:
+                          product.wished == false ||
+                          product.wished == undefined
                             ? true
                             : false,
                       };

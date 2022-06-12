@@ -16,7 +16,7 @@ LogBox.ignoreLogs([
 
 var ChangeProfileItem = (props) => {
 
-    var [error, setError] = useState()
+    var [error, setError] = useState('')
 
     var {title, value, save, isValid} = props.route.params
 
@@ -35,7 +35,7 @@ var ChangeProfileItem = (props) => {
     return (
       <View style={{flex: 1}}>
         <UIHeader
-          title={`${title}`}
+          title={title}
           leftIcon="arrow-left"
           onPressLeftIcon={() => {
             navigation.goBack()
@@ -48,7 +48,8 @@ var ChangeProfileItem = (props) => {
             onChangeText={(text) => {
               setTypedText(text)
               if (isValid !== undefined) {
-                isValid(typeText) == false ? setError('Text input is invalid') : setError('')
+                isValid(text) == false 
+                ? setError('Text input is invalid') : setError('')
               }
             }}
           />

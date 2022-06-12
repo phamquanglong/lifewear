@@ -107,7 +107,7 @@ var ProductItem = props => {
           }}>
           <Icon
             color={
-              item.isLiked == false || item.isLiked == undefined
+              item.wished == false || item.wished == undefined
                 ? colors.disable
                 : colors.primary
             }
@@ -116,7 +116,7 @@ var ProductItem = props => {
           <Text
             style={{
               color:
-                item.isLiked == false || item.isLiked == undefined
+                item.wished == false || item.wished == undefined
                   ? colors.disable
                   : colors.primary,
               fontSize: 12,

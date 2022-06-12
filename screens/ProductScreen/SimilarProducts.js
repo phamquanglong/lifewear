@@ -11,13 +11,15 @@ import {View,
 } from 'react-native';
 import ProductItem from '../ProductsGrid/ProductItem';
 import DropShadow from "react-native-drop-shadow";
-import { StackActions, useScrollToTop } from '@react-navigation/native';
+import { StackActions, useScrollToTop, useIsFocused } from '@react-navigation/native';
 import {colors} from '../../constants';
 import {refreshContext} from '../FoodList/FoodList'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { addWishList, deleteWishlist } from '../WishList/WishListController';
 import { setWishList } from '../../Store/actions';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { wishListSelector } from '../../Store/selector';
+import axios from 'axios';
 
 
 var SimilarProducts = (props) => {
@@ -27,17 +29,20 @@ var SimilarProducts = (props) => {
     dispatch(setWishList(data))
     }
 
+    var wishListRedux = useSelector(wishListSelector)
+
     var [isLoading, setIsLoading] = useState(true)
 
     var [productsData, setProductsData] = useState([])
 
     var [category, setCategory] = useState()
 
-    var getProductsByCategory = (id) => {
+    var getProductsByCategory = (id, token) => {
       fetch(`https://lifewear.mn07.xyz/api/categories/${id}?perpage=7&=`, {
         headers: {
           Accept: 'application/json',
           "Content-Type": "application/json",
+          Authorization: 'Bearer ' + token
         },
       }).then(response => response.json())
       .then(json => {
@@ -45,10 +50,13 @@ var SimilarProducts = (props) => {
         setCategory(json.name)
       })
       .then(() => setIsLoading(false))
+      .catch(err => console.log(err))
     }
 
     useLayoutEffect(() => {
-      getProductsByCategory(props.idCategory)
+      AsyncStorage.getItem('token').then(response => {
+        getProductsByCategory(props.idCategory, response)
+      })
       return () => {
         setProductsData({})
       };
@@ -61,9 +69,9 @@ var SimilarProducts = (props) => {
         if (item.name == product.name) {
           return {
             ...product,
-            isLiked:
-              product.isLiked == false ||
-              product.isLiked == undefined
+            wished:
+              product.wished == false ||
+              product.wished == undefined
                 ? true
                 : false,
           };
@@ -119,7 +127,7 @@ var SimilarProducts = (props) => {
                   item={item}
                   index={index}
                   onPress={() => {
-                    AsyncStorage.getItem('token').then(response => item.isLiked
+                    AsyncStorage.getItem('token').then(response => item.wished
                       ? deleteWishlist(item.id, response, wishListData) : addWishList(item.id, response, wishListData));
                     handleLike(item)
                   }}

@@ -194,15 +194,15 @@ var FoodList = props => {
                     item={item}
                     index={index}
                     onPress={() => {
-                      AsyncStorage.getItem('token').then(response => item.isLiked
+                      AsyncStorage.getItem('token').then(response => item.wished
                         ? deleteWishlist(item.id, response, wishListData) : addWishList(item.id, response, wishListData));
                       var cloneProducts = searchProductsList.map(product => {
                         if (item.id == product.id) {
                           return {
                             ...product,
-                            isLiked:
-                              product.isLiked == false ||
-                              product.isLiked == undefined
+                            wished:
+                              product.wished == false ||
+                              product.wished == undefined
                                 ? true
                                 : false,
                           };

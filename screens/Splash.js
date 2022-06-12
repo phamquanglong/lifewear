@@ -49,6 +49,7 @@ var Splash = (props) => {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: 'white'
     }}>
         <Animated.Image style={{
             width: 100,

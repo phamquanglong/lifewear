@@ -209,7 +209,7 @@ var Chat = (props) => {
             setModalVisible(!modalVisible);
           }}
         />
-        <View
+        {/* <View
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -231,7 +231,7 @@ var Chat = (props) => {
             }}
             onPress={() => alert('trash')}
           />
-        </View>
+        </View> */}
         <SwipeListView
           refreshControl={
             <RefreshControl

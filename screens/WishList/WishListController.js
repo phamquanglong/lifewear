@@ -16,7 +16,7 @@ export var deleteWishlist = (id, token, setData) => {
     .then(response => {
       setData !== undefined ? setData(response.data) : console.log(response)
     })
-    .catch(err => console.error(err))
+    .catch(err => console.error(err.response.data))
   }
 
   export var addWishList = (id, token, setData) => {

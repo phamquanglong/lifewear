@@ -8,6 +8,7 @@ import { deleteWishlist } from './WishListController';
 import { wishListSelector } from '../../Store/selector';
 import { setWishList } from '../../Store/actions';
 import { useDispatch, useSelector } from 'react-redux';
+import { StackActions } from '@react-navigation/native';
 
 
 var WishListScreen = (props) => {
@@ -24,7 +25,7 @@ var WishListScreen = (props) => {
             var cloneProducts = wishList.map(product => {
                 return {
                     ...product,
-                    isLiked: true
+                    wished: true
                   };
               });
               return cloneProducts
