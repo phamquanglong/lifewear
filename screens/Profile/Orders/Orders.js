@@ -8,10 +8,11 @@ import {
     faBoxOpen
   } from "@fortawesome/free-solid-svg-icons";
 import { useSelector } from 'react-redux';
-import { countConfirmationSelector } from '../../../Store/selector';
+import { orderSelector } from '../../../Store/selector';
 
 var Orders = (props) => {
-    var countConfirmation = useSelector(countConfirmationSelector)
+    var order = useSelector(orderSelector)
+    var countConfirmation = order.length
 
     var orderItemList = [
         { text: "Confirmation", icon: faReceipt },
@@ -24,10 +25,10 @@ var Orders = (props) => {
         if (item.text == "Confirmation")
             return countConfirmation
         else if (item.text == "Confirmed")
-            return 1
+            return 0
         else if (item.text == "Delivery")
-            return 2
-        else return 3
+            return 0
+        else return 0
     }
 
     return <View style={styles.container}>

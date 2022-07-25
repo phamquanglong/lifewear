@@ -150,7 +150,8 @@ var CartScreen = props => {
                       currency: 'VND',
                     })}</Text>
         </View>
-        <TouchableOpacity style={styles.btnBuyNow}
+        <TouchableOpacity style={listProducts.length > 0 ? styles.btnBuyNow : styles.btnBuyNowDisable}
+        disabled={listProducts.length === 0}
         onPress={() => {
           navigate('Payment', {listProducts: listProducts})
         }}>
@@ -190,6 +191,12 @@ var styles = StyleSheet.create({
   },
   footer: {
     backgroundColor: 'white',
+    margin: 10,
+    borderRadius: 5,
+  },
+  btnBuyNowDisable: {
+    backgroundColor: colors.disable,
+    alignItems: 'center',
     margin: 10,
     borderRadius: 5,
   }

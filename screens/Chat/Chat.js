@@ -67,8 +67,7 @@ var Chat = (props) => {
           let stringUser = await AsyncStorage.getItem("user")
           let myUserId = JSON.parse(stringUser).userId === undefined 
             ? JSON.parse(stringUser).uid : JSON.parse(stringUser).userId
-          console.log(myUserId)
-          console.log(JSON.parse(stringUser))
+          
           setFriendsList(
             Object.keys(snapshotObject).filter(item => item != myUserId)
             .map(eachKey => {
@@ -127,8 +126,10 @@ var Chat = (props) => {
         if (snapshot.exists()) {
           let snapshotObject = snapshot.val()
           let stringUser = await AsyncStorage.getItem("user")
-          let myUserId = JSON.parse(stringUser).userId
-          
+          let myUserId = JSON.parse(stringUser).userId === undefined 
+          ? JSON.parse(stringUser).uid : JSON.parse(stringUser).userId
+          console.log(myUserId)
+          console.log(JSON.parse(stringUser))
           Object.keys(snapshotObject).filter(item => item.includes(myUserId)).filter(i => i.includes(item.userId))
           .forEach(eachKey => {
             remove(firebaseDatabaseRef(firebaseDatabase, `chats/${eachKey}`))
@@ -169,7 +170,7 @@ var Chat = (props) => {
                   setIsLoading(true)
                 }}><Text style={styles.cancelButton}>Cancel</Text></TouchableOpacity>
                 <TouchableOpacity
-                onPress={() => {removeMessages(item)}}><Text style={styles.removeChat}>Remove Chat</Text></TouchableOpacity>
+                onPress={() => removeMessages(item)}><Text style={styles.removeChat}>Remove Chat</Text></TouchableOpacity>
               </View>
             </View>
             </View>
@@ -209,29 +210,7 @@ var Chat = (props) => {
             setModalVisible(!modalVisible);
           }}
         />
-        {/* <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Text
-            style={{
-              fontSize: 15,
-              color: 'black',
-              marginStart: 10,
-            }}>
-            6 unread messages
-          </Text>
-          <Icon
-            name="trash"
-            style={{
-              padding: 10,
-              fontSize: 20,
-            }}
-            onPress={() => alert('trash')}
-          />
-        </View> */}
+
         <SwipeListView
           refreshControl={
             <RefreshControl

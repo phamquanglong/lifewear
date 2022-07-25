@@ -59,7 +59,6 @@ var PaymentItem = props => {
 var Payment = props => {
   var addressId = useSelector(addressIdSelector)
   var {listProducts} = props.route.params;
-  console.log(listProducts)
 
   var {navigation, route} = props;
   var {navigate, goBack} = navigation;
@@ -130,7 +129,10 @@ var Payment = props => {
     };
 
     axios.request(options)
-    .then(response => Linking.openURL(response.data.deeplink))
+    .then(response => {
+      console.log(response)
+      Linking.openURL(response.data.deeplink)
+    })
     .catch(err => console.log(err.response.data))
   }
 
@@ -282,7 +284,7 @@ var Payment = props => {
       <TouchableOpacity style={styles.btnPayment} onPress={() => {
         if (Object.keys(addressId).length > 0 && paymentMethod.length > 0){
           if (paymentMethod[0].txt == "Payment on delivery") {
-            navigate('PaymentSuccess', {price: sum, paymentMethod: paymentMethod[0].txt})
+            navigate('PaymentSuccess', {price: sum, paymentMethod: paymentMethod[0].txt, listProducts: listProducts})
           }
           else AsyncStorage.getItem('token').then(response => proceesPayment(response))
         }

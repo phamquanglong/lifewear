@@ -111,6 +111,7 @@ var Profile = props => {
 
   var Update = () => {
     // uploadAvatar(props.route.params.token, avatar)
+    console.log(JSON.stringify(getItemChanged()));
     fetch('https://lifewear.mn07.xyz/api/user', {
       method: 'PATCH',
       headers: {
@@ -121,9 +122,16 @@ var Profile = props => {
       body: `${JSON.stringify(getItemChanged())}`,
     })
       .then(response => response.json())
+      // .then((response) => console.log(response))
       .then(data => {
-        alert(data.errors.dob);
-        setUpdate(false);
+        console.log(data)
+        if (data.errors !== undefined) {
+          if (data.errors.avatar !== undefined) {
+            setUpdate(false);
+          }
+          else alert(data.errors.dob);
+        }
+        else setUpdate(false);
       })
       .catch(err => console.log(err));
   };
@@ -165,12 +173,7 @@ var Profile = props => {
   var uploadAvatar = (avatar, token) => {
     console.log({avatar, token});
     const form = new FormData();
-    form.append("image",
-    {
-      uri: avatar,
-      type: 'image/jpeg',
-      name: 'image.jpg',
-    });
+    form.append("image", avatar);
 
     const options = {
       method: 'POST',

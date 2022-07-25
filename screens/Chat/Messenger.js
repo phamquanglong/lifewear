@@ -88,7 +88,6 @@ var Messenger = (props) => {
         <UIHeader
           title={name}
           leftIcon="arrow-left"
-          rightIcon="ellipsis-v"
           onPressLeftIcon={() => {
             goBack();
           }}
@@ -193,7 +192,7 @@ var Messenger = (props) => {
             onPress={async () => {
               if (typedText.trim().length == 0) return;
               let newMessengerObject = {
-                url: 'https://randomuser.me/api/portraits/thumb/men/32.jpg',
+                url: 'https:\/\/lifewear.mn07.xyz\/storage\/images\/users\/default-user.png',
                 showUrl: false,
                 messages: typedText,
                 timestamp: new Date().getTime(),
@@ -211,7 +210,7 @@ var Messenger = (props) => {
                 ),
                 // newMessengerObject
                 {
-                  url: 'https://randomuser.me/api/portraits/thumb/men/32.jpg',
+                  url: 'https:\/\/lifewear.mn07.xyz\/storage\/images\/users\/default-user.png',
                   showUrl: false,
                   messages: typedText,
                   timestamp: new Date().getTime(),

@@ -130,15 +130,17 @@ var ProductItem = props => {
           style={{
             flex: 1,
             alignItems: 'flex-end',
+            justifyContent: 'center',
+            height: '100%',
           }}>
           <FiveStars numberOfStars={item.rating_avg} />
-          <Text
+          {/* <Text
             style={{
               fontSize: 11,
               color: colors.facebook,
             }}>
             {item.public_reviews_count} reviews
-          </Text>
+          </Text> */}
         </View>
       </View>
     </View>

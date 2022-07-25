@@ -8,8 +8,12 @@ import {
   SET_FINGERPRINT,
   SET_ADDRESS_ID,
   SET_COUNT_CONFIRMATION,
-  SET_BUY_NOW
+  SET_BUY_NOW,
 } from './constant';
+import {
+  SET_ORDER,
+  DELETE_ORDER,
+} from '../screens/Profile/Orders/Store/constant';
 
 const initState = {
   num: 0,
@@ -17,7 +21,8 @@ const initState = {
   fingerprint: true,
   address: {},
   countConfirmation: 0,
-  buyNow: []
+  buyNow: [],
+  orders: []
 };
 
 const rootReducer = (state = initState, action) => {
@@ -66,12 +71,25 @@ const rootReducer = (state = initState, action) => {
       return {
         ...state,
         countConfirmation: action.payload,
-      }
+      };
     case SET_BUY_NOW:
       return {
         ...state,
         buyNow: action.payload,
-      }
+      };
+    case SET_ORDER:
+      return {
+        ...state,
+        orders: action.payload,
+      };
+    case DELETE_ORDER:
+      return {
+        ...state,
+        orders: [
+          state.orders,
+          action.payload,
+        ]
+      };
     default:
       return state;
   }

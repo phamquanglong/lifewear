@@ -1,15 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {colors} from '../../constants';
 import {faCheck} from '@fortawesome/free-solid-svg-icons';
-import {useSelector} from 'react-redux';
-import {addressIdSelector} from '../../Store/selector';
+import {useSelector, useDispatch} from 'react-redux';
+import {addressIdSelector, orderSelector} from '../../Store/selector';
+import { setOrder } from '../Profile/Orders/Store/actions'
 
 var PaymentSuccess = props => {
   var address = useSelector(addressIdSelector);
-  console.log(address);
-  var {price, paymentMethod} = props.route.params;
+  var order = useSelector(orderSelector);
+  console.log(order);
+  var dispatchOrder = useDispatch()
+  var dispatchHandler = () => {
+    dispatchOrder(setOrder(
+      [
+        ...order,
+        {
+          key: order.length,
+          add: address,
+          listProducts: listProducts,
+          price: price,
+          paymentMethod: paymentMethod,
+        }
+      ]
+    ))
+  }
+  var {price, paymentMethod, listProducts} = props.route.params;
 
   var { navigation, route } = props
   var { navigate, goBack } = navigation
@@ -50,7 +67,10 @@ var PaymentSuccess = props => {
         </View>
       </View>
       {/* <View style={{flex: 0.2}}></View> */}
-      <TouchableOpacity style={styles.btn} onPress={() => navigate('UITab')}>
+      <TouchableOpacity style={styles.btn} onPress={() => {
+        navigate('UITab')
+        dispatchHandler()
+        }}>
         <Text style={styles.textBtn}>Done</Text>
       </TouchableOpacity>
     </View>
